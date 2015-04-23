@@ -42,11 +42,17 @@ func init() {
 	}
 }
 
+func onConnect(conn *irc.Conn, line *irc.Line) {
+	conn.Join("#netlify")
+	if config.IRCPassword != "" {
+		conn.Privmsg("NickServ", "identify "+config.IRCPassword)
+	}
+}
+
 func main() {
 	c := irc.SimpleClient("netlibot", "netlibot")
 	c.EnableStateTracking()
-	c.HandleFunc("connected",
-		func(conn *irc.Conn, line *irc.Line) { conn.Join("#netlify") })
+	c.HandleFunc("connected", onConnect)
 
 	quit := make(chan bool)
 	c.HandleFunc("disconnected",
